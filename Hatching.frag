@@ -16,6 +16,7 @@ uniform sampler2D u_tex4; // hatch_3.jpg（斜線中）
 uniform sampler2D u_tex5; // Hatch_4.jpg（斜線密）
 uniform sampler2D u_tex6; // Hatch5.jpg（最暗端, 厚重刷痕）
 
+
 vec2 fitUV(vec2 uv, float imgAspect, float canvasAspect) {
     vec2 scale;
     if (imgAspect > canvasAspect) {
@@ -43,8 +44,10 @@ void main()
     // 以原圖「藍色通道」作為明暗值
     float shading = texture2D(u_tex0, imgUv).b;
 
-    // 六段分層
-    vec2 vUv = fract(6.0 * uv);      // 紋理平鋪座標（key）
+    // 紋理平鋪座標（key）
+    vec2 vUv = fract(6.0 * uv);      
+
+     // 六段分層
     vec4 c;
     float stepv = 1.0 / 6.0;
 
@@ -77,7 +80,7 @@ void main()
 
     vec3 finalRGB = mix(base, paper, mask * FADE);
     gl_FragColor = vec4(finalRGB, 1.0);
-    // gl_FragColor = texture2D(u_tex0, vUv);
+    // gl_FragColor = texture2D(u_tex0, imgUv);
 }
 
 
