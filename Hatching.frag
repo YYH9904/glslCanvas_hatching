@@ -24,9 +24,10 @@ void main()
     vec2 vUv = fract(6.0 * uv);      // 紋理平鋪座標（key）
 
     // 用與你一致的寬高比校正座標來取原圖與亮度
-    vec2 imgUv = uv;
-    uv.x *= u_resolution.x / u_resolution.y; 
-    imgUv.x *= u_resolution.x / u_resolution.y;
+    vec2 imgUv = uv; 
+    float aspect = u_resolution.x / u_resolution.y;
+    // 以中心為基準做寬高比修正，保持置中
+    imgUv = (imgUv - 0.5) * vec2(aspect, 1.0) + 0.5;
 
     // 以原圖「藍色通道」作為明暗值
     float shading = texture2D(u_tex0, imgUv).b;
