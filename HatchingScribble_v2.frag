@@ -93,16 +93,16 @@ void main(){
   float stepv = 1.0 / 10.0;
   float density, segLen, width, bend;
 
-  if      (L <= 1.0*stepv){ density=0.95; segLen=0.22; width=0.060; bend=0.060; }
-  else if (L <= 2.0*stepv){ density=0.85; segLen=0.22; width=0.058; bend=0.060; }
-  else if (L <= 3.0*stepv){ density=0.75; segLen=0.20; width=0.055; bend=0.055; }
-  else if (L <= 4.0*stepv){ density=0.65; segLen=0.20; width=0.052; bend=0.055; }
-  else if (L <= 5.0*stepv){ density=0.55; segLen=0.18; width=0.050; bend=0.050; }
-  else if (L <= 6.0*stepv){ density=0.45; segLen=0.18; width=0.047; bend=0.045; }
-  else if (L <= 7.0*stepv){ density=0.35; segLen=0.16; width=0.045; bend=0.040; }
-  else if (L <= 8.0*stepv){ density=0.25; segLen=0.16; width=0.042; bend=0.035; }
-  else if (L <= 9.0*stepv){ density=0.18; segLen=0.14; width=0.040; bend=0.030; }
-  else                    { density=0.10; segLen=0.12; width=0.035; bend=0.025; }
+ if      (L <= 1.0*stepv){ density=0.95; segLen=0.60; width=0.032; bend=0.060; }
+  else if (L <= 2.0*stepv){ density=0.85; segLen=0.55; width=0.030; bend=0.060; }
+  else if (L <= 3.0*stepv){ density=0.75; segLen=0.50; width=0.028; bend=0.055; }
+  else if (L <= 4.0*stepv){ density=0.65; segLen=0.45; width=0.026; bend=0.055; }
+  else if (L <= 5.0*stepv){ density=0.55; segLen=0.40; width=0.024; bend=0.050; }
+  else if (L <= 6.0*stepv){ density=0.45; segLen=0.35; width=0.022; bend=0.045; }
+  else if (L <= 7.0*stepv){ density=0.35; segLen=0.30; width=0.020; bend=0.040; }
+  else if (L <= 8.0*stepv){ density=0.25; segLen=0.25; width=0.018; bend=0.035; }
+  else if (L <= 9.0*stepv){ density=0.18; segLen=0.20; width=0.016; bend=0.030; }
+  else                    { density=0.10; segLen=0.15; width=0.014; bend=0.025; }
 
   // ---- 主筆觸層 + 兩個淡淡的疊加層（更自然）----
   float cov  = 0.70 * scribbleLayer(uv, density,        segLen,        width,        bend);
@@ -133,8 +133,8 @@ void main(){
   cov *= mix(0.7, 1.2, tone);
   cov = clamp(cov, 0.0, 1.0);
 
-  // ---- 上色（藍墨 on 白紙；需要黑墨改成 vec3(0.0) 即可）----
-  vec3 ink   = vec3(0.0, 0.0, 1.0);
+  // ---- 上色（原圖顏色當筆色）----
+  vec3 ink = normalize(src) * 0.8;
   vec3 paper = vec3(1.0);
   vec3 outRGB = mix(paper, ink, cov);
 
