@@ -7,13 +7,19 @@
     <script type="text/javascript" src="dist/GlslCanvas.js"></script>
     <style>
         body {
+            margin: 0;
             background: #101515;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* 讓 body 撐滿視窗高度 */
         }
         #glslCanvas {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            display: block;
         }
     </style>
 </head>
@@ -28,7 +34,6 @@
     var sandbox_title = "";
     var sandbox_author = "";
     var sandbox_thumbnail = "";
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
+    // 移除強制 canvas.style.width/height = 100%
 </script>
 </html>
