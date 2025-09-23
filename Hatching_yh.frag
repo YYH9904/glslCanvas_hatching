@@ -70,16 +70,9 @@ void main()
         c = mix(texture2D(u_tex1, vUv), vec4(1.0), 6.0 * (shading - 5.0 * stepv));
     }
 
-    // —— 上色：清淡、保留原圖色彩 ——
-    // c.r 越亮 = 越接近白紙；用它把原圖往紙色推，得到淡彩感
-    vec3 base  = texture2D(u_tex0, imgUv).rgb;   // 原圖顏色(for color-preserving mix)
-
-    float mask = c.r;                            // 白紙比例
-    const float FADE = 0.45;                      // 淡化強度：0.3~0.8 可調
-    vec3 paper = vec3(1.0);
-
-    vec3 finalRGB = mix(base, paper, mask * FADE);
-    gl_FragColor = vec4(finalRGB, 1.0);
+     vec4 inkColor = vec4(1.0, 1.0, 1.0, 1.0);
+     vec4 src = mix( mix( inkColor, vec4( 1. ), c.r ), c, .5 );
+     gl_FragColor = src;
 }
 
 
