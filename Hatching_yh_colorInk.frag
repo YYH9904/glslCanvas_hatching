@@ -75,7 +75,7 @@ void main()
     vec3 base  = texture2D(u_tex0, imgUv).rgb;   // 原圖顏色(for color-preserving mix)
 
     float mask = c.r;                            // 白紙比例
-    const float FADE = 0.45;                      // 淡化強度：0.3~0.8 可調
+    const float FADE = 0.8;                      // 淡化強度：0.3~0.8 可調
     vec3 paper = vec3(1.0);
 
     vec3 finalRGB = mix(base, paper, mask * FADE);
