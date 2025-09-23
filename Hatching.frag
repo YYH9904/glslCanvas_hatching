@@ -33,23 +33,20 @@ void main()
 {
     // 基本座標
     vec2 uv  = gl_FragCoord.xy / u_resolution.xy;
-    vec2 vUv = fract(6.0 * uv);      // 紋理平鋪座標（key）
 
     // show the entire image centered, with letterboxing/pillarboxing if the canvas ratio differs
     float canvasAspect = u_resolution.x / u_resolution.y;
     float imageAspect  = 1024.0 / 1536.0;   // = 0.6666667
-
     vec2 imgUv = fitUV(uv, imageAspect, canvasAspect);
-    float shading = texture2D(u_tex0, imgUv).g;   // use this everywhere you sample u_tex0
-    vec3  base    = texture2D(u_tex0, imgUv).rgb; // (for color-preserving mix)
-
 
     // 以原圖「藍色通道」作為明暗值
     float shading = texture2D(u_tex0, imgUv).b;
 
     // 六段分層
+    vec2 vUv = fract(6.0 * uv);      // 紋理平鋪座標（key）
     vec4 c;
     float stepv = 1.0 / 6.0;
+
     if (shading <= stepv){
         c = mix(texture2D(u_tex6, vUv), texture2D(u_tex5, vUv), 6.0 * shading);
     }
@@ -71,7 +68,8 @@ void main()
 
     // —— 上色：清淡、保留原圖色彩 ——
     // c.r 越亮 = 越接近白紙；用它把原圖往紙色推，得到淡彩感
-    vec3 base  = texture2D(u_tex0, imgUv).rgb;   // 原圖顏色
+    vec3 base  = texture2D(u_tex0, imgUv).rgb;   // 原圖顏色(for color-preserving mix)
+
     float mask = c.r;                            // 白紙比例
     const float FADE = 0.6;                      // 淡化強度：0.3~0.8 可調
     vec3 paper = vec3(1.0);
