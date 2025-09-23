@@ -75,8 +75,8 @@ void main()
     vec3 paper = vec3(1.0);
 
     vec3 finalRGB = mix(base, paper, mask * FADE);
-    gl_FragColor = vec4(finalRGB, 1.0);
-    // gl_FragColor = texture2D(u_tex0, vUv);
+    // gl_FragColor = vec4(finalRGB, 1.0);
+    gl_FragColor = texture2D(u_tex0, vUv);
 }
 
 
