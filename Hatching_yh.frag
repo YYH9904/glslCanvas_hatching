@@ -41,8 +41,8 @@ void main()
     float imageAspect  = 1024.0 / 1536.0;   // = 0.6666667
     vec2 imgUv = fitUV(uv, imageAspect, canvasAspect);
 
-    // 以原圖「藍色通道」作為明暗值
-    float shading = texture2D(u_tex0, imgUv).b;
+    // 以原圖「綠色通道」作為明暗值
+    float shading = texture2D(u_tex0, imgUv).g;
 
     // 紋理平鋪座標（key）
     vec2 vUv = fract(6.0 * uv);      
@@ -75,7 +75,7 @@ void main()
     vec3 base  = texture2D(u_tex0, imgUv).rgb;   // 原圖顏色(for color-preserving mix)
 
     float mask = c.r;                            // 白紙比例
-    const float FADE = 0.6;                      // 淡化強度：0.3~0.8 可調
+    const float FADE = 0.45;                      // 淡化強度：0.3~0.8 可調
     vec3 paper = vec3(1.0);
 
     vec3 finalRGB = mix(base, paper, mask * FADE);
