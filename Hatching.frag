@@ -35,10 +35,6 @@ void main()
     vec2 uv  = gl_FragCoord.xy / u_resolution.xy;
     vec2 vUv = fract(6.0 * uv);      // 紋理平鋪座標（key）
 
-    // 用與你一致的寬高比校正座標來取原圖與亮度
-    vec2 imgUv = uv; 
-    float aspect = u_resolution.x / u_resolution.y;
-
     // show the entire image centered, with letterboxing/pillarboxing if the canvas ratio differs
     float canvasAspect = u_resolution.x / u_resolution.y;
     float imageAspect  = 1024.0 / 1536.0;   // = 0.6666667
