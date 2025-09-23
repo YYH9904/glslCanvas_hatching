@@ -16,6 +16,18 @@ uniform sampler2D u_tex4; // hatch_3.jpg（斜線中）
 uniform sampler2D u_tex5; // Hatch_4.jpg（斜線密）
 uniform sampler2D u_tex6; // Hatch5.jpg（最暗端, 厚重刷痕）
 
+vec2 fitUV(vec2 uv, float imgAspect, float canvasAspect) {
+    vec2 scale;
+    if (imgAspect > canvasAspect) {
+        // image wider → fit width
+        scale = vec2(canvasAspect / imgAspect, 1.0);
+    } else {
+        // image taller → fit height
+        scale = vec2(1.0, imgAspect / canvasAspect);
+    }
+    vec2 offset = (1.0 - scale) * 0.5;
+    return offset + uv * scale; // stays within 0..1, no cropping
+}
 
 void main()
 {
@@ -26,8 +38,15 @@ void main()
     // 用與你一致的寬高比校正座標來取原圖與亮度
     vec2 imgUv = uv; 
     float aspect = u_resolution.x / u_resolution.y;
-    // 以中心為基準做寬高比修正，保持置中
-    imgUv = (imgUv - 0.5) * vec2(aspect, 1.0) + 0.5;
+
+    // show the entire image centered, with letterboxing/pillarboxing if the canvas ratio differs
+    float canvasAspect = u_resolution.x / u_resolution.y;
+    float imageAspect  = 1024.0 / 1536.0;   // = 0.6666667
+
+    vec2 imgUv = fitUV(uv, imageAspect, canvasAspect);
+    float shading = texture2D(u_tex0, imgUv).g;   // use this everywhere you sample u_tex0
+    vec3  base    = texture2D(u_tex0, imgUv).rgb; // (for color-preserving mix)
+
 
     // 以原圖「藍色通道」作為明暗值
     float shading = texture2D(u_tex0, imgUv).b;
