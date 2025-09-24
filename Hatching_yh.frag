@@ -10,8 +10,8 @@ uniform vec2 u_mouse;
 uniform float u_time;
 uniform sampler2D u_tex0; // 原圖
 uniform sampler2D u_tex1; // Hatch0.jpg（最亮端過渡前一層,極疏的紋理）
-uniform sampler2D u_tex2; // Hatch1.jpg（圓點疏）
-uniform sampler2D u_tex3; // Hatch2.jpg（圓點密）
+uniform sampler2D u_tex2; // Hatch2.jpg（圓點疏）
+uniform sampler2D u_tex3; // Hatch3.jpg（圓點密）
 uniform sampler2D u_tex4; // hatch_3.jpg（斜線中）
 uniform sampler2D u_tex5; // Hatch_4.jpg（斜線密）
 uniform sampler2D u_tex6; // Hatch5.jpg（最暗端, 厚重刷痕）
