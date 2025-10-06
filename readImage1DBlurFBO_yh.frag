@@ -20,8 +20,8 @@ const float SIGMA_LP = 3.0;      // 低通(海)模糊半徑（越大越糊）
 const float SIGMA_HP = 2.2;      // 高通(稻)的「先模糊再相減」的模糊半徑
 const float HP_GAIN  = 1.8;      // 高通增益（細節強度）
 const float FEEDBACK = 0.80;     // backbuffer 回授量（越大越拖尾糊）
-const float EDGE_START = 0.25;   // 近遠交接開始（0-1, 越小越靠中心）
-const float EDGE_WIDTH = 0.10;   // 交接柔邊寬度（更窄更銳利）
+const float EDGE_START = 0.20;   // 近遠交接開始（0-1, 越小越靠中心）
+const float EDGE_WIDTH = 0.40;   // 交接柔邊寬度（更寬更平滑）
 
 // ---------- 一維模糊 ----------
 vec3 blur1D(sampler2D tex, vec2 uv, vec2 dir, float sigma){
@@ -67,10 +67,10 @@ void main() {
 
     // A: 海 → 低通
     vec3 ocean_src = texture2D(u_tex0, uv).rgb;
-    // Sharper, more central transition
-    float m = pow(radialMask(uv), 2.5);
-    // Dramatically increase blur in far region
-    float sigma_far = mix(SIGMA_LP, SIGMA_LP * 30.0, m);
+    // Smooth, gradual transition
+    float m = radialMask(uv);
+    // Moderate blur in far region
+    float sigma_far = mix(SIGMA_LP, SIGMA_LP * 6.0, m);
     vec3 ocean_lp  = gaussian2D(u_tex0, uv, sigma_far);
 
     // 低通支路做 FBO 回授（加深遠景糊度/殘影）
