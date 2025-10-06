@@ -3,6 +3,8 @@
 // Goal: A(海)=Low-pass(+FBO回授)  ×  B(稻)=High-pass  →  近遠遮罩混合
 // Env: GlslCanvas (u_time, u_resolution, u_backbuffer, u_tex0, u_tex1)
 
+gl_FragColor = vec4(1.,0.,0.,1.); return;
+
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -30,7 +32,12 @@ const float EDGE_WIDTH = 0.25;   // 柔邊寬度
 
 // 一維高斯近似（對稱 3 階 + 中心）
 vec3 blur1D(sampler2D tex, vec2 uv, vec2 dir, float sigma) {
-    vec2 texel = 1.0 / u_resolution;
+    vec2 texel = 1.0 / max(u_resolution, vec2(1.0));
+
+    if (u_resolution.x <= 0.0 || u_resolution.y <= 0.0) {
+        gl_FragColor = vec4(0.0);
+        return;
+    }
 
     // 常用近似權重（可視為固定核，sigma 當作伸縮係數）
     float w0 = 0.227027;
@@ -93,5 +100,9 @@ void main() {
     vec3 low_accum = ocean_lp;
     if (u_time > 0.02) { // 避免第一幀讀到黑色 backbuffer
         vec3 prev = texture2D(u_backbuffer, uv).rgb;
+        float prevMag = max(max(prev.r, prev.g), prev.b);
+        float fbAmt = (prevMag > 0.0001) ? FEEDBACK : 0.0; // 沒內容就別回授
         // 只對低頻支路做回授：遠處更「空氣感」
-        low_accum = mix(ocean_lp, prev,
+        low_accum = mix(ocean_lp, prev, fbAmt);
+}
+

@@ -7,24 +7,18 @@
     <script type="text/javascript" src="dist/GlslCanvas.js"></script>
     <style>
         body {
-            margin: 0;
             background: #101515;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh; /* 讓 body 撐滿視窗高度 */
         }
         #glslCanvas {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     </style>
 </head>
 <body>
-    <canvas id="glslCanvas" data-fragment-url="LPHP_Combine.frag" width="900" height="600" data-textures="data/Waves_byChatGPT.png, data/Rice_byChatGPT.png"></canvas>
+    <canvas id="glslCanvas" data-fragment-url="LPHP_Combined.frag" width="800" height="800" data-textures="data/Waves_byChatGPT.png, data/Rice_byChatGPT.png"></canvas>
 </body>
 <script>
     var canvas = document.getElementById("glslCanvas");
@@ -34,6 +28,7 @@
     var sandbox_title = "";
     var sandbox_author = "";
     var sandbox_thumbnail = "";
-    // 移除強制 canvas.style.width/height = 100%
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
 </script>
 </html>

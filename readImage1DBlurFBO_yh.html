@@ -2,33 +2,24 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>GlslCanvas</title>
-    <script type="text/javascript" src="dist/GlslCanvas.js"></script>
-    <style>
-        body {
-            background: #101515;
-        }
-        #glslCanvas {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>GlslCanvas — sanity check</title>
+  <script type="text/javascript" src="dist/GlslCanvas.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; background:#101515; }
+    #glslCanvas { width: 100vw; height: 100vh; display:block; }
+  </style>
 </head>
 <body>
-    <canvas id="glslCanvas" data-fragment-url="readImage1DBlurFBO_yh.frag" width="800" height="800" data-textures="data/Waves_byChatGPT.png, data/Rice_byChatGPT.png"></canvas>
+  <!-- 你的 canvas 保留即可：data-fragment-url 指向 readImage1DBlurFBO_yh.frag -->
+  <canvas id="glslCanvas"
+          data-fragment-url="readImage1DBlurFBO_yh.frag"
+          data-textures="data/Waves_byChatGPT.png, data/Rice_byChatGPT.png"></canvas>
 </body>
 <script>
-    var canvas = document.getElementById("glslCanvas");
-    var sandbox = new GlslCanvas(canvas);
-    var texCounter = 0;
-    var sandbox_content = "";
-    var sandbox_title = "";
-    var sandbox_author = "";
-    var sandbox_thumbnail = "";
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
+  const canvas = document.getElementById("glslCanvas");
+  const sandbox = new GlslCanvas(canvas);
+  // ✅ 不要再用 JS 設 width/height = '100%'，交給上面 CSS
 </script>
+
 </html>
