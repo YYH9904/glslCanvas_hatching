@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Hybrid Image — Waves (Low) + Rice (High)</title>
+  <script src="dist/GlslCanvas.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; background:#101515; }
+    body { display:flex; align-items:center; justify-content:center; }
+  #glslCanvas { width:100vw; height:100vh; display:block; }
+  </style>
+</head>
+
+<body>
+
+  <canvas
+    id="glslCanvas"
+    width="800" height="800"
+    data-fragment-url="Hybrid_Waves_Rice_MouseReveal.frag?v=strong"
+    data-textures="data/Wavesv2_byChatGPT.png, data/Ricev3_byChatGPT.png">
+  </canvas>
+
+  <script>
+    const canvas = document.getElementById("glslCanvas");
+    const sandbox = new GlslCanvas(canvas);
+
+    canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = rect.height - (e.clientY - rect.top); // 座標反轉以符合UV
+        sandbox.setUniform("u_mouse", [x, y]);
+    });
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.width = '100vw';
+      canvas.style.height = '100vh';
+      if (sandbox) {
+        sandbox.setUniform('u_resolution', [canvas.width, canvas.height]);
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    // 這版不需 backbuffer / u_speed；純靜態 hybrid
+  </script>
+</body>
+
+</html>
