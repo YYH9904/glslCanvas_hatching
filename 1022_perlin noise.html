@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>GlslCanvas</title>
+    <script type="text/javascript" src="dist/GlslCanvas.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #101515;
+            font-family: sans-serif;
+            color: #f3f3f3;
+        }
+        #glslCanvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .controls {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: rgba(16, 21, 21, 0.85);
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .controls label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .controls input[type="range"] {
+            width: 160px;
+        }
+        .controls span {
+            min-width: 40px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .controls select {
+            flex: 1 1 auto;
+            padding: 4px 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f3f3f3;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="glslCanvas" data-fragment-url="1022_perlin noise.frag" width="800" height="800" data-textures="data/CMH_oilpaint.png, data/CMH.png"></canvas>
+    <div class="controls">
+        <label>
+            Material
+            <select id="materialSelect">
+                <option value="0">Clouds</option>
+                <option value="1">Lava</option>
+                <option value="2">Marble</option>
+                <option value="3">Wood</option>
+            </select>
+        </label>
+        <label>
+            Scale
+            <input id="scaleSlider" type="range" min="0.5" max="16" value="5" step="0.1">
+            <span id="scaleValue">5.0</span>
+        </label>
+        <label>
+            Octaves
+            <input id="octaveSlider" type="range" min="1" max="8" value="4" step="1">
+            <span id="octaveValue">4</span>
+        </label>
+    </div>
+</body>
+<script>
+    var canvas = document.getElementById("glslCanvas");
+    var sandbox = new GlslCanvas(canvas);
+    var texCounter = 0;
+    var sandbox_content = "";
+    var sandbox_title = "";
+    var sandbox_author = "";
+    var sandbox_thumbnail = "";
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    function updateUniform(name, value) {
+        sandbox.setUniform(name, value);
+    }
+
+    var scaleSlider = document.getElementById("scaleSlider");
+    var scaleValue = document.getElementById("scaleValue");
+    var octaveSlider = document.getElementById("octaveSlider");
+    var octaveValue = document.getElementById("octaveValue");
+    var materialSelect = document.getElementById("materialSelect");
+
+    function syncScale() {
+        var val = parseFloat(scaleSlider.value);
+        scaleValue.textContent = val.toFixed(1);
+        updateUniform("u_scale", val);
+    }
+
+    function syncOctaves() {
+        var val = parseFloat(octaveSlider.value);
+        octaveValue.textContent = val.toFixed(0);
+        updateUniform("u_octaves", val);
+    }
+
+    function syncMaterial() {
+        var val = parseFloat(materialSelect.value);
+        updateUniform("u_material", val);
+    }
+
+    scaleSlider.addEventListener("input", syncScale);
+    octaveSlider.addEventListener("input", syncOctaves);
+    materialSelect.addEventListener("change", syncMaterial);
+    syncScale();
+    syncOctaves();
+    syncMaterial();
+</script>
+</html>
