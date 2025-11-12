@@ -24,9 +24,8 @@ uniform sampler2D u_buffer0;	//FBO from previous iterated frame
 
 //#define SOURCE_COLORS
 #define EVERY_PIXEL_SAME_COLOR
-#define TRIANGLES
-#define CIRCLES
-#define CIRCLE_PATTERN
+#define DRAW_CIRCLES    // use randomly placed dots/circles as the mutation primitive
+//#define TRIANGLES     // optional fallback
 
 //Randomness code from Martin, here: https://www.shadertoy.com/view/XlfGDS
 float Random_Final(vec2 uv, float seed)
@@ -36,7 +35,8 @@ float Random_Final(vec2 uv, float seed)
     return fract(sin(x) * 43758.5453);
 }
 
-//Test if a point is in a triangle
+#ifdef TRIANGLES
+//Test if a point is in a triangle (kept for optional use)
 bool pointInTriangle(vec2 triPoint1, vec2 triPoint2, vec2 triPoint3, vec2 testPoint)
 {
     float denominator = ((triPoint2.y - triPoint3.y)*(triPoint1.x - triPoint3.x) + (triPoint3.x - triPoint2.x)*(triPoint1.y - triPoint3.y));
@@ -46,12 +46,7 @@ bool pointInTriangle(vec2 triPoint1, vec2 triPoint2, vec2 triPoint3, vec2 testPo
  
     return 0.0 <= a && a <= 1.0 && 0.0 <= b && b <= 1.0 && 0.0 <= c && c <= 1.0;
 }
-
-//Simple circular mask so we can optionally gate mutations by disks instead of triangles
-bool pointInCircle(vec2 center, float radius, vec2 testPoint)
-{
-    return distance(testPoint, center) <= radius;
-}
+#endif
 
 void main()
 {
@@ -59,15 +54,15 @@ void main()
     vec2 testUV = imageUV;
 
 #ifdef EVERY_PIXEL_SAME_COLOR
-    testUV = vec2(1.0, 1.0);   // force the same random seed for all pixels so everyone proposes the same triangle/color each frame
+    testUV = vec2(1.0, 1.0);   
 #endif
 
-    // derive three pseudo-random vertices that define the candidate mutation triangle
+#ifdef TRIANGLES
     vec2 triPoint1 = vec2(Random_Final(testUV, iTime), Random_Final(testUV, iTime * 2.0));
     vec2 triPoint2 = vec2(Random_Final(testUV, iTime * 3.0), Random_Final(testUV, iTime * 4.0));
     vec2 triPoint3 = vec2(Random_Final(testUV, iTime * 5.0), Random_Final(testUV, iTime * 6.0));
+#endif
 
-    // candidate color either comes from pure randomness or (optionally) sourced from u_tex1
     vec4 testColor = vec4(Random_Final(testUV, iTime * 10.0),
                           Random_Final(testUV, iTime * 11.0),
                           Random_Final(testUV, iTime * 12.0),
@@ -86,38 +81,37 @@ void main()
 
     gl_FragColor = prevColor;
 
-    bool isInTriangle = true;
-    bool isInCircle = true;
+    vec4 candidateColor = testColor;
+    bool canMutate = true;
 
 #ifdef TRIANGLES
-    isInTriangle = pointInTriangle(triPoint1, triPoint2, triPoint3, imageUV); // only pixels inside the candidate triangle can mutate
+    bool isInTriangle = pointInTriangle(triPoint1, triPoint2, triPoint3, imageUV); 
+    canMutate = isInTriangle;
 #endif
 
-#ifdef CIRCLES
+#ifdef DRAW_CIRCLES
     vec2 circleCenter = vec2(Random_Final(testUV, iTime * 7.0), Random_Final(testUV, iTime * 8.0)); // random disk center
-    float circleRadius = 0.2 + Random_Final(testUV, iTime * 9.0) * 0.3; // keep radius in a usable range
-    isInCircle = pointInCircle(circleCenter, circleRadius, imageUV);
+    float circleRadius = 0.02 + Random_Final(testUV, iTime * 9.0) * 0.18; // dots from 2% to 20% of the canvas
+    float circleDist = distance(imageUV, circleCenter);
+    float softness = 0.01;
+    float circleMask = 1.0 - smoothstep(circleRadius - softness, circleRadius + softness, circleDist);
+    canMutate = circleMask > 0.0;
+    candidateColor = mix(prevColor, testColor, circleMask); // only alter color inside the circle footprint
 #endif
+
     // original
     /*if(isInTriangle && abs(length(trueColor - testColor)) < abs(length(trueColor - prevColor)))
     {  gl_FragColor = testColor;}*/
 
-    // modified for forward and backward evolution
-    if(isInTriangle && isInCircle)
+     // modified for forward and backward evolution
+    if(canMutate)
     {
         float prevDiff = abs(length(trueColor - prevColor));   // current error vs. target
-        float testDiff = abs(length(trueColor - testColor));   // candidate error vs. target
+        float testDiff = abs(length(trueColor - candidateColor));   // candidate error vs. target
         float score = prevDiff-testDiff;
-        if(u_time < 20.0 && score < 0.0) gl_FragColor = testColor;          // backwards evolution phase keeps worse candidates
-        else if(u_time >= 20.0 && score > 0.0) gl_FragColor = testColor;    // after 20s only improvements are accepted
+        if(u_time < 20.0 && score < 0.0) gl_FragColor = candidateColor;          // backwards evolution phase keeps worse candidates
+        else if(u_time >= 20.0 && score > 0.0) gl_FragColor = candidateColor;    // after 20s only improvements are accepted
         
     }
-
-#ifdef CIRCLE_PATTERN
-    // Overlay a tiled circle pattern to emphasize the evolving strokes
-    vec2 patternUV = fract(imageUV * 16.0) - 0.5;      // repeat pattern 16 times across the image
-    float ring = smoothstep(0.28, 0.24, length(patternUV)); // soft circle mask
-    gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * 0.6, ring); // darken color where circle is present
-#endif
 
 }
